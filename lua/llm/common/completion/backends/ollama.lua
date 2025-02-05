@@ -23,6 +23,19 @@ end
 
 function ollama.request(opts)
   utils.terminate_all_jobs()
+  local LLM_KEY = os.getenv("LLM_KEY")
+  local LLM_AUTH_STRAT = os.getenv("LLM_AUTH_STRAT")
+
+  local authorization_strategy = "Bearer"
+  if LLM_AUTH_STRAT ~= nil then
+    authorization_strategy = LLM_AUTH_STRAT
+  end
+
+  local authorization = "Authorization: " .. authorization_strategy .. " " .. LLM_KEY
+
+  if LLM_KEY == "NONE" or LLM_KEY == "" then
+    authorization = ""
+  end
 
   local body = {
     model = opts.model,
@@ -44,6 +57,8 @@ function ollama.request(opts)
     "POST",
     "-H",
     "Content-Type: application/json",
+    "-H",
+    authorization,
     "--max-time",
     opts.timeout,
     "-d",
