@@ -736,6 +736,7 @@ function M.GetUrlOutput(
   M.show_spinner(waiting_state)
   local ACCOUNT = os.getenv("ACCOUNT")
   local LLM_KEY = os.getenv("LLM_KEY")
+  local LLM_AUTH_STRAT = os.getenv("LLM_AUTH_STRAT")
 
   if fetch_key ~= nil then
     LLM_KEY = fetch_key()
@@ -753,7 +754,12 @@ function M.GetUrlOutput(
   local body = nil
   local assistant_output = ""
   local parse = nil
-  local authorization = "Authorization: Bearer " .. LLM_KEY
+
+  local authorization_strategy = "Bearer"
+  if LLM_AUTH_STRAT ~= nil then
+    authorization_strategy = LLM_AUTH_STRAT
+  end
+  local authorization = "Authorization: " .. authorization_strategy .. " " .. LLM_KEY
 
   if parse_handler then
     parse = function(chunk)
